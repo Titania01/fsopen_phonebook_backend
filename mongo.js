@@ -25,12 +25,7 @@ const personSchema = new mongoose.Schema({
 
 const Person = mongoose.model('Person', personSchema)
 
-// const person = new Person({
-//   name: 'Badmus Adegbite',
-//   number: 090867234123,
-//   date: new Date(),
-//   important: true,
-// })
+
 
 if (process.argv.length === 3) {
         Person.find({}).then(result => {
@@ -53,7 +48,3 @@ if (process.argv.length > 3) {
     }) 
 }
 
-// person.save().then(result => {
-//   console.log('person created!')
-//   mongoose.connection.close()
-// })
