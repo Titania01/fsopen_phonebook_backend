@@ -2,6 +2,11 @@ const express = require('express')
 const app = express()
 const morgan = require('morgan')
 const cors = require('cors')
+const mongoose = require('mongoose')
+
+const url ='mongodb+srv://Bigmus:Bigmus@cluster0.d4hlj.mongodb.net/phonebookTest?retryWrites=true&w=majority'
+
+mongoose.connect(url)
 
 app.use(express.json())
 
@@ -14,28 +19,27 @@ morgan.token('data', function(req, res) {
 })
 app.use(morgan(':method :url :status :res[content-length] - response-time ms :data'))
 
-let persons = [
-    { 
-      id: 1,
-      name: "Arto Hellas", 
-      number: "040-123456"
+const personSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true
+      },
+    number: {
+        type: String,
+        required: true
     },
-    { 
-      id: 2,
-      name: "Ada Lovelace", 
-      number: "39-44-5323523"
-    },
-    { 
-      id: 3,
-      name: "Dan Abramov", 
-      number: "12-43-234345"
-    },
-    { 
-      id: 4,
-      name: "Mary Poppendieck", 
-      number: "39-23-6423122"
-    }
-]
+  })
+
+  personSchema.set('toJSON', {
+      transform: (document, returnedObject) => {
+          returnedObject.id = returnedObject._id.toString()
+          delete returnedObject._id
+          delete returnedObject.__v
+      }
+  })
+
+  const Person = mongoose.model('Person', personSchema)
+
 
 let info = [
     {
@@ -49,7 +53,9 @@ app.get('/', (_req, res) => {
 })
 
 app.get('/api/persons', (_req, res) => {
-    res.json(persons)
+    Person.find({}).then(persons => {
+        res.json(persons)
+    })
 })
 
 app.get('/info', (_req, res) => {
